@@ -1,0 +1,21 @@
+<Application x:Class="TaskbarMusic.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Global Styles -->
+        <Style x:Key="LyricTextStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="NoWrap"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="4" ShadowDepth="1" Color="#000000" Opacity="0.8"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>

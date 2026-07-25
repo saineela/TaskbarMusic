@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.MusicRelay" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/nitro_orange</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimaryContainer">@color/nitro_orange</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:windowBackground">@color/black</item>
+    </style>
+
+    <style name="CircleAppearance">
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>

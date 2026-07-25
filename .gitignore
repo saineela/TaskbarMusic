@@ -1,0 +1,53 @@
+# ========================
+# .NET / WPF Build Output
+# ========================
+bin/
+obj/
+*.user
+*.suo
+*.sln.docstates
+*.userprefs
+
+# ========================
+# .NET Publish Output
+# ========================
+publish/
+publish-single/
+
+# ========================
+# Android Build Output
+# ========================
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# ========================
+# IDE / Editor
+# ========================
+.vs/
+*.swp
+*.swo
+*~
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# ========================
+# NuGet
+# ========================
+packages/
+*.nupkg
+
+# ========================
+# User-specific config
+# ========================
+# Config is stored in %APPDATA%\TaskbarMusic at runtime,
+# not in the repo. But just in case:
+**/config.json
