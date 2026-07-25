@@ -22,6 +22,8 @@ namespace TaskbarMusic.Services
         public string TransliterationTarget { get; set; } = "Latin";
         /// <summary>Custom WebSocket URL override (if empty, uses default relay + device token).</summary>
         public string CustomWebSocketUrl { get; set; } = string.Empty;
+        /// <summary>When true, uses local Windows SMTC for media detection instead of phone relay.</summary>
+        public bool ThisDeviceMode { get; set; } = false;
     }
 
     /// <summary>
@@ -171,7 +173,8 @@ namespace TaskbarMusic.Services
                 IsLocked = false,
                 DeviceToken = string.Empty,
                 TransliterationEnabled = false,
-                TransliterationTarget = "Latin"
+                TransliterationTarget = "Latin",
+                ThisDeviceMode = false
             };
         }
 
@@ -214,6 +217,26 @@ namespace TaskbarMusic.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"[Config] Save custom WebSocket URL error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Saves the This Device Mode toggle state to the config file.
+        /// </summary>
+        public static void SaveThisDeviceMode(bool enabled)
+        {
+            try
+            {
+                Directory.CreateDirectory(ConfigDir);
+                var existing = Load();
+                existing.ThisDeviceMode = enabled;
+                var json = JsonSerializer.Serialize(existing, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(ConfigPath, json);
+                Console.WriteLine($"[Config] Saved ThisDeviceMode: {enabled}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Config] Save ThisDeviceMode error: {ex.Message}");
             }
         }
 

@@ -54,6 +54,9 @@ namespace TaskbarMusic
         private DateTime _tuningStartTime = DateTime.MinValue;
         private bool _isPlainTextLyrics = false;
 
+        // --- This Device Mode ---
+        private bool _thisDeviceMode = false;
+
         // --- Permanently locked position (hardcoded: 55, 1140) ---
         private double _lockedX = 55;
         private double _lockedY = 1140;
@@ -90,7 +93,7 @@ namespace TaskbarMusic
             _positionTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
             _positionTimer.Tick += PositionTimer_Tick;
 
-            _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _refreshTimer.Tick += RefreshTimer_Tick;
 
             _demoTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
@@ -140,6 +143,15 @@ namespace TaskbarMusic
                 _transliterationTarget = savedTarget;
             }
             Console.WriteLine($"[TaskbarMusic] Loaded transliteration state: enabled={_transliterationEnabled}, target={_transliterationTarget}");
+
+            // Load persisted This Device Mode
+            _thisDeviceMode = config.ThisDeviceMode;
+            ThisDeviceMenuItem.IsChecked = _thisDeviceMode;
+            if (_thisDeviceMode)
+            {
+                UpdateThisDeviceIndicator();
+                Console.WriteLine("[TaskbarMusic] This Device Mode enabled — using local SMTC");
+            }
 
             // Load custom WebSocket URL and apply it to the service
             if (!string.IsNullOrEmpty(config.CustomWebSocketUrl))
@@ -215,7 +227,8 @@ namespace TaskbarMusic
 
         private async void RefreshTimer_Tick(object? sender, EventArgs e)
         {
-            if (_webSocketConnected) return;
+            // In This Device Mode, always poll SMTC regardless of WebSocket state
+            if (_webSocketConnected && !_thisDeviceMode) return;
             await RefreshMediaInfoAsync();
         }
 
@@ -247,6 +260,23 @@ namespace TaskbarMusic
                     StatusText.Text = $"♪ {mediaInfo.Artist} — {mediaInfo.Title}";
                     StatusText.Foreground = new SolidColorBrush(Colors.White);
                     await FetchLyricsAsync(mediaInfo);
+                }
+                else if (_syncStartTime != null)
+                {
+                    // Only track play/pause transitions from SMTC.
+                    // Do NOT reset the local clock on every tick — that would cap
+                    // position at ~1s and prevent lyrics from advancing past line 2.
+                    // The PositionTimer's free-running clock is the source of truth.
+                    if (_isPlaying != mediaInfo.IsPlaying)
+                    {
+                        // Save the current position at the moment of state change
+                        var currentPos = _syncBasePosition +
+                            (_isPlaying ? (DateTime.UtcNow - _syncStartTime.Value).TotalSeconds : 0);
+                        _syncBasePosition = Math.Max(0, currentPos);
+                        _syncStartTime = DateTime.UtcNow;
+                        _isPlaying = mediaInfo.IsPlaying;
+                        Console.WriteLine($"[TaskbarMusic] SMTC: {(_isPlaying ? "resumed" : "paused")} @ {currentPos:F1}s");
+                    }
                 }
             }
             catch (Exception ex)
@@ -466,6 +496,36 @@ namespace TaskbarMusic
         /// </summary>
         private void UpdateTranslitIndicator() { }
 
+        /// <summary>
+        /// Updates the connection indicator to show This Device Mode is active (blue).
+        /// </summary>
+        private void UpdateThisDeviceIndicator()
+        {
+            ConnectionIndicator.Visibility = Visibility.Visible;
+            ConnectionIndicator.Fill = new SolidColorBrush(Color.FromRgb(0x4F, 0xA8, 0xED));
+            ConnectionIndicator.ToolTip = "💻 This Device Mode — using local SMTC";
+        }
+
+        /// <summary>
+        /// Reverts the connection indicator when This Device Mode is disabled.
+        /// If WebSocket is connected, shows green (connected); otherwise gray.
+        /// </summary>
+        private void ClearThisDeviceIndicator()
+        {
+            if (_webSocketConnected)
+            {
+                ConnectionIndicator.Fill = new SolidColorBrush(Colors.LightGreen);
+                ConnectionIndicator.ToolTip = null;
+                StatusText.Text = "";  // Blank — waiting for phone data
+                StatusText.Foreground = new SolidColorBrush(Colors.White);
+            }
+            else
+            {
+                ConnectionIndicator.Fill = new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55));
+                ConnectionIndicator.ToolTip = null;
+            }
+        }
+
         // ==================== VIEW CACHED DIALOG ====================
 
         private void ShowCachedLyricsDialog()
@@ -603,6 +663,13 @@ namespace TaskbarMusic
 
         private async void OnWsTrackReceived(object? sender, TrackReceivedEventArgs e)
         {
+            // In This Device Mode, ignore phone track data — use local SMTC instead
+            if (_thisDeviceMode)
+            {
+                Console.WriteLine("[TaskbarMusic] WS Track ignored (This Device Mode active)");
+                return;
+            }
+
             // Auto-exit tuning mode if a new track arrives
             if (_isTuningMode) ExitTuningMode(false);
 
@@ -657,6 +724,13 @@ namespace TaskbarMusic
 
         private async void OnWsResumeRequestReceived(object? sender, SyncStartEventArgs e)
         {
+            // In This Device Mode, ignore phone resume requests — use local SMTC instead
+            if (_thisDeviceMode)
+            {
+                Console.WriteLine("[TaskbarMusic] WS Resume request ignored (This Device Mode active)");
+                return;
+            }
+
             // Any message from phone = phone is alive
             _lastHeartbeatTime = DateTime.UtcNow;
             if (!_phoneAlive) { _phoneAlive = true; OnPhoneCameBack(); }
@@ -687,6 +761,9 @@ namespace TaskbarMusic
 
         private void OnWsPositionReceived(object? sender, PositionReceivedEventArgs e)
         {
+            // In This Device Mode, ignore phone position updates
+            if (_thisDeviceMode) return;
+
             // Any message from phone = phone is alive
             _lastHeartbeatTime = DateTime.UtcNow;
             if (!_phoneAlive) { _phoneAlive = true; OnPhoneCameBack(); }
@@ -709,13 +786,22 @@ namespace TaskbarMusic
                 if (connected)
                 {
                     StopDemo();
-                    ConnectionIndicator.Fill = new SolidColorBrush(Colors.LightGreen);
-                    StatusText.Text = "";  // Blank until phone sends data
-                    StatusText.Foreground = new SolidColorBrush(Colors.White);
+                    if (_thisDeviceMode)
+                    {
+                        // In This Device Mode, don't blank the display — SMTC is in control
+                        UpdateThisDeviceIndicator();
+                    }
+                    else
+                    {
+                        ConnectionIndicator.Fill = new SolidColorBrush(Colors.LightGreen);
+                        StatusText.Text = "";  // Blank until phone sends data
+                        StatusText.Foreground = new SolidColorBrush(Colors.White);
+                    }
                 }
                 else
                 {
-                    ClearPhoneState();
+                    if (!_thisDeviceMode)
+                        ClearPhoneState();
                 }
             });
 
@@ -738,6 +824,11 @@ namespace TaskbarMusic
         /// </summary>
         private void OnWsPhoneDisconnected(object? sender, EventArgs e)
         {
+            if (_thisDeviceMode)
+            {
+                Console.WriteLine("[TaskbarMusic] Phone disconnected (ignored — This Device Mode active)");
+                return;
+            }
             Console.WriteLine("[TaskbarMusic] Phone sent disconnect — clearing now");
             ClearPhoneState();
         }
@@ -747,7 +838,8 @@ namespace TaskbarMusic
             if (!_phoneAlive)
             {
                 _phoneAlive = true;
-                OnPhoneCameBack();
+                if (!_thisDeviceMode)
+                    OnPhoneCameBack();
             }
         }
 
@@ -802,7 +894,8 @@ namespace TaskbarMusic
             if (missedMs > 35000) // Heartbeat is every 30s, give 5s grace
             {
                 Console.WriteLine($"[TaskbarMusic] Heartbeat missed for {missedMs / 1000:F0}s — phone gone");
-                ClearPhoneState();
+                if (!_thisDeviceMode)
+                    ClearPhoneState();
             }
         }
         // ==================== CUSTOM WEBSOCKET URL DIALOG ====================
@@ -1129,7 +1222,7 @@ namespace TaskbarMusic
 
         private void ShowWaitingMessage()
         {
-            if (_demoActive || _webSocketConnected) return;
+            if (_demoActive || (_webSocketConnected && !_thisDeviceMode)) return;
             StartDemo();
         }
 
@@ -1251,6 +1344,32 @@ namespace TaskbarMusic
             var exitItem = new System.Windows.Controls.MenuItem { Header = "❌ Exit" };
             exitItem.Click += (s, args) => ExitApp();
 
+            // ── This Device Mode toggle ──
+            var thisDeviceItem = new System.Windows.Controls.MenuItem
+            {
+                Header = "💻 This Device",
+                IsCheckable = true,
+                IsChecked = _thisDeviceMode,
+                ToolTip = "Detect music playing on this Windows device via SMTC instead of phone relay"
+            };
+            thisDeviceItem.Checked += (s, args) =>
+            {
+                _thisDeviceMode = true;
+                ThisDeviceMenuItem.IsChecked = true;
+                ConfigService.SaveThisDeviceMode(true);
+                UpdateThisDeviceIndicator();
+                Console.WriteLine("[TaskbarMusic] This Device Mode enabled (from right-click)");
+                _ = RefreshMediaInfoAsync();
+            };
+            thisDeviceItem.Unchecked += (s, args) =>
+            {
+                _thisDeviceMode = false;
+                ThisDeviceMenuItem.IsChecked = false;
+                ConfigService.SaveThisDeviceMode(false);
+                ClearThisDeviceIndicator();
+                Console.WriteLine("[TaskbarMusic] This Device Mode disabled (from right-click)");
+            };
+
             // Tune Lyrics — available for any track with loaded lyrics
             var tuneItem = new System.Windows.Controls.MenuItem
             {
@@ -1262,6 +1381,8 @@ namespace TaskbarMusic
             tuneItem.Click += (s, args) => EnterTuningMode();
 
             menu.Items.Add(translitMenu);
+            menu.Items.Add(new System.Windows.Controls.Separator());
+            menu.Items.Add(thisDeviceItem);
             menu.Items.Add(new System.Windows.Controls.Separator());
             menu.Items.Add(resyncItem);
             menu.Items.Add(offsetItem);
@@ -1555,6 +1676,27 @@ namespace TaskbarMusic
         {
             if (_isMinimizedToTray) ShowFromTray();
             else MinimizeToTray();
+        }
+
+        private void TrayThisDevice_Click(object sender, RoutedEventArgs e)
+        {
+            _thisDeviceMode = ThisDeviceMenuItem.IsChecked;
+            ConfigService.SaveThisDeviceMode(_thisDeviceMode);
+
+            if (_thisDeviceMode)
+            {
+                UpdateThisDeviceIndicator();
+                Console.WriteLine("[TaskbarMusic] This Device Mode enabled — switching to local SMTC");
+                // Immediately poll SMTC for current media
+                _ = RefreshMediaInfoAsync();
+            }
+            else
+            {
+                ClearThisDeviceIndicator();
+                Console.WriteLine("[TaskbarMusic] This Device Mode disabled — resuming phone relay");
+                // If WebSocket is connected and has a track, that will take over via events
+                // If not connected, SMTC refresh timer will handle fallback
+            }
         }
 
         private void TrayStartup_Click(object sender, RoutedEventArgs e)

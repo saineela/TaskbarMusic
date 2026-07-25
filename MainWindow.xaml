@@ -25,6 +25,8 @@
                 <ContextMenu>
                     <MenuItem Header="🎤 Show/Hide Lyrics" Click="TrayShowHide_Click"/>
                     <Separator/>
+                    <MenuItem Header="💻 This Device" IsCheckable="True" IsChecked="False" x:Name="ThisDeviceMenuItem" Click="TrayThisDevice_Click" ToolTip="Detect music playing on this Windows device via SMTC instead of phone relay"/>
+                    <Separator/>
                     <MenuItem Header="🚀 Run on Startup" IsCheckable="True" IsChecked="False" x:Name="StartupMenuItem" Click="TrayStartup_Click"/>
                     <Separator/>
                     <MenuItem Header="❌ Exit" Click="TrayExit_Click"/>
