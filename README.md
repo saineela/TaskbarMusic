@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="docs/images/TaskbarMusic_logo.png" width="200" title="TaskbarMusic logo">
+    <img src="docs/images/TaskbarMusic_logo.png" width="550" title="TaskbarMusic logo">
 </p>
 
 # TaskbarMusic
