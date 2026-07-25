@@ -7,6 +7,7 @@ obj/
 *.suo
 *.sln.docstates
 *.userprefs
+builds/
 
 # ========================
 # .NET Publish Output
@@ -38,6 +39,11 @@ android/.idea/
 *.iml
 .DS_Store
 Thumbs.db
+
+# ========================
+# Release artifacts
+# ========================
+RELEASE_NOTES.md
 
 # ========================
 # NuGet
