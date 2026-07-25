@@ -53,7 +53,7 @@ namespace TaskbarMusic.Services
     public class WebSocketService : IDisposable
     {
         // Direct WebSocket relay URL — configure via right-click menu > WebSocket URL
-        private const string DefaultWsBaseUrl = string.Empty;
+        private const string DefaultWsBaseUrl = "";
 
         // Custom URL override (set via right-click menu, persisted in config)
         private string _customWebSocketUrl = string.Empty;
