@@ -9,7 +9,7 @@ import android.util.Log
  * to access active media sessions via getActiveSessions().
  *
  * The user must grant notification access in:
- * Settings → Apps → Special app access → Notification access → Music Relay
+ * Settings → Apps → Special app access → Notification access → TaskbarMusic
  */
 class MusicNotificationListener : NotificationListenerService() {
 

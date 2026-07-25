@@ -11,8 +11,8 @@
     <string name="status_idle">Waiting for music…</string>
     <string name="start_service">Start Service</string>
     <string name="stop_service">Stop Service</string>
-    <string name="app_name_caps">TASKBAR MUSIC</string>
-    <string name="acer_edition">Acer Nitro V 16 AI Edition</string>
+    <string name="app_name_caps">TASKBARMUSIC</string>
+    <string name="tagline">SYNCED TO YOUR TASKBAR</string>
     <string name="system_status">SYSTEM STATUS</string>
     <string name="feature_relay">Relay</string>
     <string name="feature_sync">Sync</string>

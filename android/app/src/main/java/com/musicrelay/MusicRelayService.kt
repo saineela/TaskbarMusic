@@ -385,7 +385,7 @@ class MusicRelayService : Service() {
                 getString(R.string.notification_channel_name),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Music relay service notifications"
+                description = "TaskbarMusic service notifications"
                 setShowBadge(false)
             }
             val manager = getSystemService(NotificationManager::class.java)

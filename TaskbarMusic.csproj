@@ -29,6 +29,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- App tray icon -->
+    <Resource Include="Resources\AppLogo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Bridge script is extracted from embedded resources at runtime (single-file safe) -->
     <EmbeddedResource Include="transliterate_bridge.py" />
   </ItemGroup>

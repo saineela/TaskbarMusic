@@ -181,6 +181,22 @@ namespace TaskbarMusic
             // Store HWND once for background timer (avoids WindowInteropHelper every tick)
             _hwnd = new WindowInteropHelper(this).Handle;
 
+            // Set tray icon from embedded .ico resource
+            try
+            {
+                var iconUri = new Uri("pack://application:,,,/Resources/AppLogo.ico", UriKind.Absolute);
+                var iconInfo = Application.GetResourceStream(iconUri);
+                if (iconInfo?.Stream != null)
+                {
+                    TrayIcon.Icon = new System.Drawing.Icon(iconInfo.Stream);
+                    Console.WriteLine("[TaskbarMusic] Tray icon loaded from embedded .ico");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[TaskbarMusic] Tray icon not available: {ex.Message}");
+            }
+
             // Background timer: SetWindowPos every 150ms from a non-UI thread.
             // The UI thread gets blocked during Start menu animations — but
             // SetWindowPos is a raw Win32 call safe from any thread.

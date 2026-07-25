@@ -13,7 +13,7 @@
         android:id="@+id/headerBg"
         android:layout_width="match_parent"
         android:layout_height="320dp"
-        android:background="@color/nitro_dark_gray"
+        android:background="@color/taskbar_dark_gray"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- App Logo -->
@@ -25,12 +25,12 @@
         android:padding="4dp"
         android:src="@drawable/app_logo"
         android:scaleType="centerCrop"
-        android:background="@color/nitro_orange"
+        android:background="@color/taskbar_accent"
         app:shapeAppearanceOverlay="@style/CircleAppearance"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:strokeColor="@color/nitro_orange"
+        app:strokeColor="@color/taskbar_accent"
         app:strokeWidth="2dp" />
 
     <!-- App Name -->
@@ -52,8 +52,8 @@
         android:id="@+id/subtitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/acer_edition"
-        android:textColor="@color/nitro_orange"
+        android:text="@string/tagline"
+        android:textColor="@color/taskbar_accent"
         android:textSize="12sp"
         android:textStyle="bold"
         android:textAllCaps="true"
@@ -71,7 +71,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginTop="48dp"
-        app:cardBackgroundColor="@color/nitro_gray"
+        app:cardBackgroundColor="@color/taskbar_gray"
         app:cardCornerRadius="24dp"
         app:cardElevation="0dp"
         app:strokeWidth="1dp"
@@ -133,7 +133,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@android:drawable/ic_menu_share"
-                app:tint="@color/nitro_orange"
+                app:tint="@color/taskbar_accent"
                 android:contentDescription="@string/feature_relay" />
             <TextView
                 android:layout_width="wrap_content"
@@ -154,7 +154,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@android:drawable/ic_menu_recent_history"
-                app:tint="@color/nitro_orange"
+                app:tint="@color/taskbar_accent"
                 android:contentDescription="@string/feature_sync" />
             <TextView
                 android:layout_width="wrap_content"
@@ -175,7 +175,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@android:drawable/ic_lock_idle_low_battery"
-                app:tint="@color/nitro_orange"
+                app:tint="@color/taskbar_accent"
                 android:contentDescription="@string/feature_efficiency" />
             <TextView
                 android:layout_width="wrap_content"
@@ -199,7 +199,7 @@
         android:text="🌐 WebSocket URL"
         android:textColor="@color/white"
         android:textSize="14sp"
-        app:backgroundTint="@color/nitro_dark_gray"
+        app:backgroundTint="@color/taskbar_dark_gray"
         app:cornerRadius="24dp"
         app:strokeWidth="1dp"
         app:strokeColor="#33FFFFFF"
@@ -220,7 +220,7 @@
         android:textSize="16sp"
         android:textStyle="bold"
         android:letterSpacing="0.1"
-        app:backgroundTint="@color/nitro_orange"
+        app:backgroundTint="@color/taskbar_accent"
         app:cornerRadius="32dp"
         app:elevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"

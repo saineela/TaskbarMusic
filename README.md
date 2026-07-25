@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="docs/images/logo.png" width="200" title="TaskbarMusic logo">
+    <img src="docs/images/TaskbarMusic_logo.png" width="200" title="TaskbarMusic logo">
 </p>
 
 # TaskbarMusic
@@ -245,7 +245,7 @@ Run `sudo taskbarmusic` on the server for a full management menu:
 
 ```
 ============================================
-        Nitro Music WS Manager
+        TaskbarMusic WS Manager
 ============================================
 1) Create Pair
 2) Delete Pair

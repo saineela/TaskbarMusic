@@ -127,7 +127,7 @@ class MediaSessionMonitor(
             // Start periodic re-query as safety net (some devices don't fire session listener reliably)
             handler.postDelayed(sessionRequeryRunnable, 5_000)
         } catch (e: SecurityException) {
-            Log.e(TAG, "Notification access required! Open Settings → Apps → Special access → Notification access → Music Relay")
+            Log.e(TAG, "Notification access required! Open Settings → Apps → Special access → Notification access → TaskbarMusic")
             onUpdate(null)
         }
     }

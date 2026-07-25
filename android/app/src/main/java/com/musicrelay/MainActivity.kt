@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
     private fun showNotificationAccessDialog() {
         MaterialAlertDialogBuilder(this)
             .setTitle("Notification Access Required")
-            .setMessage("Music Relay needs notification access to detect what song is playing.\n\nYou'll be taken to Settings — enable \"Music Relay\" and come back.")
+            .setMessage("TaskbarMusic needs notification access to detect what song is playing.\n\nYou'll be taken to Settings — enable \"TaskbarMusic\" and come back.")
             .setPositiveButton("Open Settings") { _, _ ->
                 val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
                 startActivity(intent)

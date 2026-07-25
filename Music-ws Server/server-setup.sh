@@ -296,7 +296,7 @@ def reset_password():
 def main_menu():
     while True:
         print("\n" + "="*40)
-        print("        Nitro Music WS Manager")
+        print("        TaskBarMusic WS Manager")
         print("="*40)
         print("1) Create Pair")
         print("2) Delete Pair")
